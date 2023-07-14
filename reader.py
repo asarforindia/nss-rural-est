@@ -45,6 +45,7 @@ def read_nss68_consumer_expen(base):
 def read_nss68_employ_unemp(base):
     nss68eu_b12_data, nss68eu_b12_meta = read_dta(pjoin(base, 'Block_1_2.dta'))
     nss68eu_b3_data, nss68eu_b3_meta = read_dta(pjoin(base, 'Block_3.dta'))
+    nss68eu_b8_data, nss68eu_b8_meta = read_dta(pjoin(base, 'Block_8.dta'))
 
     b12_cols = [
         'Sector', 'Sub_Sample', 'State', 'District_Code', 'Stratum',
@@ -52,10 +53,15 @@ def read_nss68_employ_unemp(base):
     ]
     b12 = nss68eu_b12_data.set_index('HHID')[b12_cols]
     b12['MLT'] = b12['MLT'] / 100
-    data = b12.assign(hhsize=nss68eu_b3_data['HH_Size'].to_numpy())
+    nss68eu_b8_data = nss68eu_b8_data[nss68eu_b8_data['Item_Group_Srl_No'] == '40']
+    b8 = nss68eu_b8_data.set_index('HHID')[['Value_of_Consumption_Last_30_Day']]
+    data = (b12.assign(hhsize=nss68eu_b3_data['HH_Size'].to_numpy().astype(int))
+            .join(b8))
+
     data.columns = [
-        'sector', 'subsample', 'state', 'district', 'stratum', 'substratum',
-        'response_code', 'combined_weight', 'subsample_weight', 'hhsize'
+        'sector', 'subsample', 'state', 'district', 'stratum',
+        'substratum', 'response_code', 'combined_weight',
+        'subsample_weight', 'hhsize', 'monthly_percap_expen'
     ]
     data['hhsize'] = data['hhsize'].astype(int)
     return data
