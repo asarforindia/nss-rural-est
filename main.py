@@ -95,10 +95,16 @@ def main(inp, cache, outp, which=None):
 
 
 if __name__ == '__main__':
-    parser = argparse.ArgumentParser()
-    parser.add_argument('inp')
-    parser.add_argument('cache')
-    parser.add_argument('outp')
-    parser.add_argument('--which')
+    parser = argparse.ArgumentParser(
+        'Script to run the estimation procedure and '
+        'save estimates to the "outp" directory')
+    parser.add_argument(
+        'inp', 'microdata input. unused if proper cache input is provided')
+    parser.add_argument('cache', 'provide path to cache directory')
+    parser.add_argument('outp', 'provide path to output directory')
+    parser.add_argument(
+        '--which',
+        'for selectively running surveys, provide comma separated names'
+    )
     args = parser.parse_args()
     main(args.inp, args.cache, args.outp, args.which)
