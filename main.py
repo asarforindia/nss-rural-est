@@ -57,9 +57,7 @@ def save_output(estimates, outp):
     for survey, (rural, response) in estimates.items():
         skip_errors = '76' in survey
         rural_est, rural_var = rural
-        rural_items[survey] = (
-            rural_est, np.sqrt(rural_var) if not skip_errors else None
-        )
+        rural_items[survey] = rural_est, np.sqrt(rural_var)
         if response is not None:
             response_est, response_var = response
             response_items[survey] = pd.DataFrame({
@@ -99,12 +97,12 @@ if __name__ == '__main__':
         'Script to run the estimation procedure and '
         'save estimates to the "outp" directory')
     parser.add_argument(
-        'inp', 'microdata input. unused if proper cache input is provided')
-    parser.add_argument('cache', 'provide path to cache directory')
-    parser.add_argument('outp', 'provide path to output directory')
+        'inp', help='microdata input. unused if proper cache input is provided')
+    parser.add_argument('cache', help='provide path to cache directory')
+    parser.add_argument('outp', help='provide path to output directory')
     parser.add_argument(
         '--which',
-        'for selectively running surveys, provide comma separated names'
+        help='for selectively running surveys, provide comma separated names'
     )
     args = parser.parse_args()
     main(args.inp, args.cache, args.outp, args.which)
