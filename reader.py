@@ -1,9 +1,6 @@
 import os
-import numpy as np
 import pandas as pd
 from pyreadstat import read_dta
-
-import warnings
 
 
 def pjoin(b, p):
@@ -182,18 +179,9 @@ def read_nss76_disability(base):
 
     b12_cols = pd.Index([
         'Sector', 'NSS_Region', 'District', 'Stratum',
-        'Sub_stratum', 'Response_Code', 'MULT'
+        'Sub_stratum', 'FSU_Serial_No', 'Response_Code', 'MULT'
     ])
     b12 = nss76pd_l1_data.set_index('HHID')[b12_cols]
-
-    # making up the subsample division for consistency.
-    # standard errors will be incorrect - we will fix in the next version
-    warnings.warn('nss75_disability: unreliable error estimates')
-    b12['Sub_Sample'] = np.random.choice(['1', '2'], size=b12.shape[0])
-    b12['Multiplier_SS'] = b12['MULT'] * 2
-    b12 = b12[['Sector', 'Sub_Sample', 'NSS_Region', 'District', 'Stratum',
-               'Sub_stratum', 'Response_Code', 'MULT', 'Multiplier_SS'
-               ]]
 
     b3_cols = ['Household_size', 'Usual_monthly_consumer_expenditu']
     b3 = nss76pd_l3_data.set_index('HHID')[b3_cols].astype(int)
@@ -201,9 +189,8 @@ def read_nss76_disability(base):
     data = b12.join(b3)
 
     data.columns = [
-        'sector', 'subsample', 'state', 'district', 'stratum', 'substratum',
-        'response_code', 'combined_weight', 'subsample_weight',
-        'hhsize', 'monthly_percap_expen'
+        'sector', 'state', 'district', 'stratum', 'substratum', 'fsu',
+        'response_code', 'weight', 'hhsize', 'monthly_percap_expen'
     ]
     return data
 
@@ -214,18 +201,9 @@ def read_nss76_sanitation(base):
 
     b12_cols = pd.Index([
         'Sector', 'NSS_Region', 'District', 'Stratum',
-        'Sub_stratum', 'Response_Code', 'Multiplier'
+        'Sub_stratum', 'FSUSerialNo', 'Response_Code', 'Multiplier'
     ])
     b12 = nss76dw_l1_data.set_index('HHID')[b12_cols]
-
-    # making up the subsample division for consistency.
-    # standard errors will be incorrect - we will fix in the next version
-    warnings.warn('nss75_disability: unreliable error estimates')
-    b12['Sub_Sample'] = np.random.choice(['1', '2'], size=b12.shape[0])
-    b12['Multiplier_SS'] = b12['Multiplier'] * 2
-    b12 = b12[['Sector', 'Sub_Sample', 'NSS_Region', 'District', 'Stratum',
-               'Sub_stratum', 'Response_Code', 'Multiplier', 'Multiplier_SS'
-               ]]
 
     b3_cols = ['HH_size', 'Total_Monthly_expenditure']
     b3 = nss76dw_l3_data.set_index('HHID')[b3_cols].astype(int)
@@ -233,8 +211,7 @@ def read_nss76_sanitation(base):
     data = b12.join(b3)
 
     data.columns = [
-        'sector', 'subsample', 'state', 'district', 'stratum', 'substratum',
-        'response_code', 'combined_weight', 'subsample_weight',
-        'hhsize', 'monthly_percap_expen'
+        'sector', 'state', 'district', 'stratum', 'substratum', 'fsu',
+        'response_code', 'weight', 'hhsize', 'monthly_percap_expen'
     ]
     return data
